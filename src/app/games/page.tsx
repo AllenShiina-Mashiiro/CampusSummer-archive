@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { GameCard } from "@/components/game-card";
 
@@ -12,12 +13,12 @@ export default async function GamesPage({ searchParams }: Props) {
   const q = params.q?.trim() || "";
   const tag = params.tag?.trim() || "";
   const company = params.company?.trim() || "";
-  const conditions = [
-    ...(q ? [{ OR: [{ title: { contains: q, mode: "insensitive" as const } }, { summary: { contains: q, mode: "insensitive" as const } }, { developer: { contains: q, mode: "insensitive" as const } }, { publisher: { contains: q, mode: "insensitive" as const } }] }] : []),
-    ...(company ? [{ OR: [{ developer: { contains: company, mode: "insensitive" as const } }, { publisher: { contains: company, mode: "insensitive" as const } }] }] : []),
+  const conditions: Prisma.GameWhereInput[] = [
+    ...(q ? [{ OR: [{ title: { contains: q, mode: "insensitive" } }, { summary: { contains: q, mode: "insensitive" } }, { developer: { contains: q, mode: "insensitive" } }, { publisher: { contains: q, mode: "insensitive" } }] }] : []),
+    ...(company ? [{ OR: [{ developer: { contains: company, mode: "insensitive" } }, { publisher: { contains: company, mode: "insensitive" } }] }] : []),
     ...(tag ? [{ tags: { has: tag } }] : []),
   ];
-  const where = { status: "PUBLISHED" as const, ...(conditions.length ? { AND: conditions } : {}) };
+  const where: Prisma.GameWhereInput = { status: "PUBLISHED", ...(conditions.length ? { AND: conditions } : {}) };
   const [games, count] = await Promise.all([
     prisma.game.findMany({ where, orderBy: [{ featured: "desc" }, { createdAt: "desc" }], take: 48 }),
     prisma.game.count({ where }),
