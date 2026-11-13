@@ -9,10 +9,10 @@ export default async function HomePage() {
   const [games, gameCount, companyRows, tagRows] = await Promise.all([
     prisma.game.findMany({ where: { status: "PUBLISHED" }, orderBy: { updatedAt: "desc" }, take: 6 }),
     prisma.game.count({ where: { status: "PUBLISHED" } }),
-    prisma.game.findMany({ where: { status: "PUBLISHED", developer: { not: null } }, select: { developer: true }, distinct: ["developer"] }),
+    prisma.game.findMany({ where: { status: "PUBLISHED" }, select: { developer: true, publisher: true } }),
     prisma.game.findMany({ where: { status: "PUBLISHED" }, select: { tags: true } }),
   ]);
-  const companyCount = companyRows.length;
+  const companyCount = new Set(companyRows.flatMap((row) => [row.developer, row.publisher]).filter((name): name is string => Boolean(name))).size;
   const tagCount = new Set(tagRows.flatMap((row) => row.tags)).size;
 
   return (
