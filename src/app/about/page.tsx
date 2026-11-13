@@ -1,5 +1,19 @@
 import type { Metadata } from "next";
+
 export const metadata: Metadata = { title: "关于我们" };
+
 export default function AboutPage() {
-  return <section className="subpage"><p className="section-kicker">ABOUT THE PROJECT ✳</p><h1>关于学园夏日局</h1><p className="subpage-lead">一个关于游戏、青春与创作的数字档案馆。</p><div className="about-copy"><p>CampusSummer Archive 希望成为一个长期生长的游戏文化站点。我们关注视觉小说与相关游戏作品，也珍惜围绕作品产生的创作、讨论和记忆。</p><p>这里会逐步建立游戏资料库、文化专题与资料收藏空间，让喜欢这些故事的人能够发现、整理并分享值得留存的内容。</p></div></section>;
+  return (
+    <section className="page-shell narrow-shell">
+      <div className="page-heading"><p className="eyebrow">ABOUT THIS PROJECT</p><h1>关于我们</h1><p>Campus Archive 是一个以游戏作品资料整理为核心的独立档案项目。</p></div>
+      <div className="prose-panel">
+        <h2>项目目标</h2>
+        <p>我们希望建立一个结构清晰、便于检索、能够长期维护的游戏资料库。档案内容以作品基础信息为核心，并逐步整理游戏会社、标签、发行信息与相关说明。</p>
+        <h2>资料原则</h2>
+        <p>尽可能区分已确认资料与待补充内容，保留资料来源，并尊重作品及其相关素材的权利归属。封面与截图可由站点维护者后续上传或替换。</p>
+        <h2>栏目</h2>
+        <p>游戏档案用于查阅作品；游戏会社用于整理制作与发行团队；游戏标签用于交叉分类；说明文档记录本站的数据规范与使用方式。</p>
+      </div>
+    </section>
+  );
 }
