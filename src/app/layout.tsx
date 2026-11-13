@@ -4,11 +4,8 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 
 export const metadata: Metadata = {
-  title: {
-    default: "CampusSummer Archive｜学园夏日局",
-    template: "%s｜CampusSummer Archive",
-  },
-  description: "收藏游戏里的夏日、故事与青春。一个关于视觉小说与游戏文化的数字档案馆。",
+  title: { default: "CampusSummer Archive｜游戏档案", template: "%s｜CampusSummer Archive" },
+  description: "以作品、会社与标签为索引的游戏资料档案。",
   applicationName: "CampusSummer Archive",
 };
 
