@@ -1,63 +1,53 @@
 import Link from "next/link";
-import { ArrowDownRight, ArrowUpRight, BookOpen, Compass, Sparkles } from "lucide-react";
+import { ArrowRight, Building2, Tags, BookOpen, Search } from "lucide-react";
+import { prisma } from "@/lib/prisma";
+import { GameCard } from "@/components/game-card";
 
-const features = [
-  { number: "01", title: "游戏档案", en: "GAME LIBRARY", desc: "从作品信息到游玩印象，建立一份可以慢慢翻阅的游戏收藏。", href: "/games", icon: BookOpen },
-  { number: "02", title: "文化手记", en: "CULTURE NOTES", desc: "记录视觉小说、创作者与玩家文化中的灵感和故事。", href: "/articles", icon: Sparkles },
-  { number: "03", title: "资料收藏", en: "ARCHIVE ROOM", desc: "整理值得保存的访谈、设定资料与社区知识。", href: "/archive", icon: Compass },
-];
+export const dynamic = "force-dynamic";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [games, gameCount, companyRows, tagRows] = await Promise.all([
+    prisma.game.findMany({ where: { status: "PUBLISHED" }, orderBy: { updatedAt: "desc" }, take: 6 }),
+    prisma.game.count({ where: { status: "PUBLISHED" } }),
+    prisma.game.findMany({ where: { status: "PUBLISHED", developer: { not: null } }, select: { developer: true }, distinct: ["developer"] }),
+    prisma.game.findMany({ where: { status: "PUBLISHED" }, select: { tags: true } }),
+  ]);
+  const companyCount = companyRows.length;
+  const tagCount = new Set(tagRows.flatMap((row) => row.tags)).size;
+
   return (
     <>
-      <section className="hero">
-        <div className="hero-sun" />
-        <div className="hero-grid" />
-        <div className="hero-content">
-          <p className="eyebrow"><span className="eyebrow-dot" /> A LITTLE PLACE FOR GAME CULTURE</p>
-          <h1>把夏日的故事，<br /><span>收藏在这里。</span></h1>
-          <p className="hero-description">一座关于游戏、青春与创作的数字档案馆。<br />在这里，重新发现那些值得珍藏的瞬间。</p>
-          <div className="hero-actions">
-            <Link className="button-primary" href="/games">探索游戏档案 <ArrowUpRight size={17} /></Link>
-            <Link className="button-text" href="/about">认识学园夏日局 <ArrowDownRight size={16} /></Link>
-          </div>
-          <div className="hero-meta"><span>EST. 2025</span><i /> <span>AN ARCHIVE OF STORIES</span></div>
+      <section className="home-hero">
+        <div className="hero-inner">
+          <p className="eyebrow">VISUAL NOVEL & GAME DATABASE</p>
+          <h1>发现作品，<span>整理热爱。</span></h1>
+          <p className="hero-copy">以作品为核心，收录游戏信息、制作会社与标签索引。<br className="desktop-only" />建立清晰、易查阅、持续更新的游戏档案。</p>
+          <form action="/games" className="hero-search">
+            <Search size={19} />
+            <input name="q" placeholder="搜索游戏名称、会社或关键词…" aria-label="搜索游戏" />
+            <button type="submit">搜索作品</button>
+          </form>
+          <div className="hero-shortcuts"><Link href="/games">浏览全部作品 <ArrowRight size={15} /></Link><Link href="/companies">按会社查找 <ArrowRight size={15} /></Link></div>
         </div>
-        <div className="hero-art" aria-hidden="true">
-          <div className="sun-disc" />
-          <div className="art-cloud cloud-one" /><div className="art-cloud cloud-two" />
-          <div className="art-hill hill-back" /><div className="art-hill hill-front" />
-          <div className="art-caption"><span>SUMMER MEMORY / 001</span><strong>Somewhere,<br />the summer stays.</strong></div>
-          <div className="art-stamp">夏<br />日<br />記<br />録</div>
-        </div>
-        <div className="hero-side-note">青春は、何度でも。</div>
-        <div className="hero-bottom"><span>SCROLL TO EXPLORE</span><span className="scroll-line" /></div>
+        <div className="hero-index"><span>DATABASE</span><strong>01</strong><span>CATALOGUE</span></div>
       </section>
 
-      <section className="intro-section section-wrap">
-        <div className="section-kicker">WELCOME TO OUR ARCHIVE <span>✳</span></div>
-        <div className="intro-grid">
-          <h2>不只是游玩。<br /><em>也是一种收藏。</em></h2>
-          <div className="intro-copy"><p>有些故事会在通关后继续留在心里，有些画面会让一个季节变得特别。CampusSummer Archive 希望把这些关于游戏的记忆与文化，整理成一座可以持续生长的档案馆。</p><span>一个为热爱游戏文化的人准备的小小据点。</span></div>
-        </div>
+      <section className="stats-strip">
+        <div><strong>{gameCount.toLocaleString("zh-CN")}</strong><span>收录作品</span></div>
+        <div><strong>{companyCount.toLocaleString("zh-CN")}</strong><span>游戏会社</span></div>
+        <div><strong>{tagCount.toLocaleString("zh-CN")}</strong><span>作品标签</span></div>
+        <div className="stats-note">持续整理 · 持续更新</div>
       </section>
 
-      <section className="feature-section">
-        <div className="section-wrap">
-          <div className="section-heading"><div><div className="section-kicker">EXPLORE THE ARCHIVE <span>✳</span></div><h2>从这里开始探索</h2></div><p>三条路径，通往同一个<br />关于游戏与故事的世界。</p></div>
-          <div className="feature-grid">
-            {features.map(({ number, title, en, desc, href, icon: Icon }) => (
-              <Link className="feature-card" href={href} key={number}>
-                <div className="feature-top"><span>{number} / 03</span><Icon size={22} strokeWidth={1.5} /></div>
-                <div><p className="feature-en">{en}</p><h3>{title}</h3><p className="feature-desc">{desc}</p></div>
-                <div className="feature-bottom"><span>进入栏目</span><ArrowUpRight size={18} /></div>
-              </Link>
-            ))}
-          </div>
-        </div>
+      <section className="content-section">
+        <div className="section-heading"><div><p className="eyebrow">LATEST ENTRIES</p><h2>最近收录</h2><p>近期加入档案库的作品</p></div><Link className="text-link" href="/games">查看全部 <ArrowRight size={16} /></Link></div>
+        {games.length ? <div className="game-grid">{games.map((game) => <GameCard key={game.id} game={game} />)}</div> : <div className="empty-state"><BookOpen size={28} /><h3>档案库正在建立中</h3><p>目前还没有公开的作品条目。完成数据录入后，作品会显示在这里。</p><Link href="/docs">查看资料录入说明 <ArrowRight size={15} /></Link></div>}
       </section>
 
-      <section className="quote-section"><div className="quote-mark">“</div><p>夏天不会结束，<br /><span>只要还有故事值得回味。</span></p><small>— CAMPUSSUMMER ARCHIVE</small></section>
+      <section className="directory-section">
+        <div className="directory-card"><Building2 size={25} /><div><h3>游戏会社</h3><p>按制作会社与发行会社浏览作品。</p><Link href="/companies">浏览会社索引 <ArrowRight size={15} /></Link></div></div>
+        <div className="directory-card"><Tags size={25} /><div><h3>游戏标签</h3><p>通过题材、类型与关键词发现作品。</p><Link href="/tags">浏览标签索引 <ArrowRight size={15} /></Link></div></div>
+      </section>
     </>
   );
 }
