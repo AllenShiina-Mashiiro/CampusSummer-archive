@@ -13,35 +13,25 @@
 
 ### 1. 环境要求
 
-Node.js 20.9+、npm 10+、Docker Desktop 或 Docker Engine。
+Node.js 20.9+、npm 10+，以及可连接的 PostgreSQL 18 实例。Redis 仅在启用缓存功能时需要。
 
-### 2. 安装依赖
+### 2. 安装依赖并配置环境变量
 
 ```bash
 npm install
 cp .env.example .env
 ```
 
-### 3. 启动 PostgreSQL 与 Redis
+根据你自己的 PostgreSQL 实例修改 `.env` 中的 `DATABASE_URL`。如果启用 Redis，也请配置对应的 `REDIS_URL`。
 
-```bash
-docker compose up -d
-```
-
-默认开发连接：
-- PostgreSQL：localhost:5432，数据库 `campussummer`
-- Redis：localhost:6379
-
-请仅在本地开发使用示例密码；部署前务必替换为安全凭据。
-
-### 4. 初始化 Prisma
+### 3. 初始化 Prisma
 
 ```bash
 npm run db:generate
 npm run db:push
 ```
 
-### 5. 启动网站
+### 4. 启动网站
 
 ```bash
 npm run dev
