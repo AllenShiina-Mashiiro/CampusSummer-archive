@@ -1,6 +1,39 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { prisma } from "@/lib/prisma";
+import { GameCard } from "@/components/game-card";
+
 export const metadata: Metadata = { title: "游戏档案" };
-export default function GamesPage() {
-  return <section className="subpage"><p className="section-kicker">GAME LIBRARY ✳</p><h1>游戏档案</h1><p className="subpage-lead">每一部作品，都是一段值得被认真记录的旅程。</p><div className="empty-panel"><span>COMING SOON / 001</span><h2>档案室正在整理中。</h2><p>游戏条目、作品标签与详细资料页将在接下来的开发阶段陆续开放。</p><Link href="/">← 返回首页</Link></div></section>;
+export const dynamic = "force-dynamic";
+
+type Props = { searchParams: Promise<{ q?: string; tag?: string; company?: string }> };
+
+export default async function GamesPage({ searchParams }: Props) {
+  const params = await searchParams;
+  const q = params.q?.trim() || "";
+  const tag = params.tag?.trim() || "";
+  const company = params.company?.trim() || "";
+  const conditions = [
+    ...(q ? [{ OR: [{ title: { contains: q, mode: "insensitive" as const } }, { summary: { contains: q, mode: "insensitive" as const } }, { developer: { contains: q, mode: "insensitive" as const } }, { publisher: { contains: q, mode: "insensitive" as const } }] }] : []),
+    ...(company ? [{ OR: [{ developer: { contains: company, mode: "insensitive" as const } }, { publisher: { contains: company, mode: "insensitive" as const } }] }] : []),
+    ...(tag ? [{ tags: { has: tag } }] : []),
+  ];
+  const where = { status: "PUBLISHED" as const, ...(conditions.length ? { AND: conditions } : {}) };
+  const [games, count] = await Promise.all([
+    prisma.game.findMany({ where, orderBy: [{ featured: "desc" }, { createdAt: "desc" }], take: 48 }),
+    prisma.game.count({ where }),
+  ]);
+
+  return (
+    <section className="page-content">
+      <div className="page-title-row"><div><p className="page-kicker">DATABASE / GAME INDEX</p><h1>游戏档案</h1><p className="page-lead">浏览已收录的游戏作品，按名称、会社与标签查找。</p></div><span className="result-count">共收录 {count} 部作品</span></div>
+      <form className="filter-bar" action="/games">
+        <input name="q" defaultValue={q} placeholder="搜索游戏名称、简介或会社…" aria-label="搜索游戏" />
+        {tag && <input type="hidden" name="tag" value={tag} />}
+        {company && <input type="hidden" name="company" value={company} />}
+        <button type="submit">搜索</button>
+      </form>
+      {(tag || company) && <p className="result-count">当前筛选：{[company, tag].filter(Boolean).join(" / ")}　<a href="/games">清除筛选</a></p>}
+      {games.length ? <div className="game-grid">{games.map((game) => <GameCard key={game.id} game={game} />)}</div> : <div className="empty-state"><strong>没有找到匹配的游戏</strong><p>可以尝试更换关键词，或稍后再来查看新增档案。</p></div>}
+    </section>
+  );
 }
