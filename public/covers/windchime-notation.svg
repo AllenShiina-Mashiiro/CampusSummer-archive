@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#d9f99d"/>
+      <stop offset="100%" stop-color="#3f6212"/>
+    </linearGradient>
+    <filter id="soft"><feGaussianBlur stdDeviation="55"/></filter>
+    <linearGradient id="fade" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#000" stop-opacity="0.45"/>
+      <stop offset="60%" stop-color="#000" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#bg)"/>
+  <g filter="url(#soft)" opacity="0.75">
+    <circle cx="392.0105554446849" cy="363.8835752182883" r="150" fill="#ffffff" opacity="0.45"/>
+    <circle cx="717.6063248185724" cy="409.41357925752186" r="190" fill="#ffffff" opacity="0.25"/>
+    <circle cx="621.2875438888213" cy="140.96212422044334" r="120" fill="#ffffff" opacity="0.3"/>
+  </g>
+  <g stroke="#ffffff" stroke-opacity="0.18">
+    <path d="M0 380 L800 300" stroke-width="1"/>
+    <path d="M0 420 L800 360" stroke-width="1"/>
+    <path d="M0 460 L800 420" stroke-width="1"/>
+  </g>
+  <rect width="800" height="500" fill="url(#fade)"/>
+  <text x="48" y="408" font-family="system-ui, 'Segoe UI', sans-serif" font-size="30" font-weight="700" fill="#ffffff" opacity="0.96">风铃记谱法</text>
+  <text x="48" y="446" font-family="system-ui, 'Segoe UI', sans-serif" font-size="15" letter-spacing="3" fill="#ffffff" opacity="0.7">WINDCHIME NOTATION</text>
+  <text x="48" y="60" font-family="system-ui, sans-serif" font-size="12" letter-spacing="4" fill="#ffffff" opacity="0.55">CAMPUSSUMMER ARCHIVE</text>
+</svg>

@@ -1,9 +1,15 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   cacheComponents: true,
   partialPrefetching: true,
+
+  /**
+   * 开发服务器默认只信任 localhost。用 127.0.0.1 访问时，HMR 与 dev 资源会被判定为
+   * 跨来源而拦掉，客户端脚本因此不执行（表现为所有按钮点了没反应）。
+   */
+  allowedDevOrigins: ["127.0.0.1", "localhost"],
+
   turbopack: {
     rules: {
       "*.css": {

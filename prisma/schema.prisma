@@ -1,0 +1,563 @@
+// CampusSummer Archive / 学园夏日局 —— 数据模型
+//
+// 面向「游戏文化档案」：作品条目、开发会社、标签、资源、文档与社区互动。
+// 站点只做条目化整理与引用，不托管、不分发任何游戏文件。
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/* ------------------------------- 用户与关系 ------------------------------ */
+
+enum Role {
+  USER // 普通用户：下载、讨论、评价、个人设置
+  CREATOR // 创作者：额外可发布 / 管理自己的游戏与资源
+  MODERATOR // 管理员：额外可审核创作者、处置违规内容与账号
+  ADMIN // 管理员（与 MODERATOR 同级，保留给历史数据）
+  SUPER_ADMIN // 超级管理员：全部权限，含升降权、站点设置、日志、邮件群发
+}
+
+model User {
+  id           String    @id @default(cuid())
+  username     String    @unique
+  email        String    @unique
+  passwordHash String
+  displayName  String
+  avatarUrl    String?
+  bio          String?
+  role         Role      @default(USER)
+  /// 樱花点：签到与贡献获得的积分，同时作为等级经验
+  points       Int       @default(0)
+  lastCheckIn  DateTime?
+  /// 封禁截止时间；为空表示未封禁
+  bannedUntil  DateTime?
+  banReason    String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  games       Game[]
+  resources   Resource[]
+  comments    Comment[]
+  ratings     Rating[]
+  collections Collection[]
+  docs        Doc[]
+  messages    Message[]
+  followers   Follow[]  @relation("FollowTarget")
+  following   Follow[]  @relation("FollowSource")
+  blockedTags BlockedTag[]
+  blockedGames BlockedGame[]
+  commentLikes CommentLike[]
+  ratingLikes  RatingLike[]
+  resourceLikes ResourceLike[]
+  conversationsA Conversation[] @relation("ConversationA")
+  conversationsB Conversation[] @relation("ConversationB")
+  directMessages DirectMessage[]
+  notifications  Notification[] @relation("NotificationUser")
+  actedNotifications Notification[] @relation("NotificationActor")
+
+  @@index([points])
+}
+
+model Follow {
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+
+  follower  User @relation("FollowSource", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("FollowTarget", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@id([followerId, followingId])
+  @@index([followingId])
+}
+
+/// 举报：讨论 / 评价 / 用户
+model Report {
+  id           String    @id @default(cuid())
+  targetType   String // COMMENT | RATING | USER
+  targetId     String
+  targetUserId String?
+  reporterId   String
+  reason       String
+  status       String    @default("PENDING") // PENDING | ACCEPTED | REJECTED
+  handledById  String?
+  handledAt    DateTime?
+  createdAt    DateTime  @default(now())
+
+  @@index([status, createdAt])
+}
+
+/// 管理日志（错误与关键操作）
+model AdminLog {
+  id        String   @id @default(cuid())
+  level     String   @default("INFO")
+  source    String   @default("")
+  message   String
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+/// 站点级键值配置（站名、logo、背景图、签到弹窗、用户协议、联系方式等）
+model SiteSetting {
+  key       String   @id
+  value     String   @default("")
+  updatedAt DateTime @updatedAt
+}
+
+/// 友情链接：由超级管理员在「网站设置」里增删改（图片 / 标题 / 简介 / 跳转链接）
+model FriendLink {
+  id          String   @id @default(cuid())
+  title       String
+  description String   @default("")
+  url         String
+  imageUrl    String?
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([sortOrder])
+}
+
+/// 邮箱验证码：注册必须验证邮箱；只保存加盐哈希，不落明文
+model VerificationCode {
+  id        String   @id @default(cuid())
+  email     String
+  codeHash  String
+  expiresAt DateTime
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([email, createdAt])
+}
+
+/// 创作者申请
+model CreatorApplication {
+  id          String    @id @default(cuid())
+  userId      String
+  reason      String
+  identity    String?
+  works       String?
+  contact     String?
+  status      String    @default("PENDING") // PENDING | ACCEPTED | REJECTED
+  handledById String?
+  handledAt   DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([status, createdAt])
+}
+
+/// 申诉：封禁或内容被删
+model Appeal {
+  id          String    @id @default(cuid())
+  userId      String
+  kind        String    @default("BAN") // BAN | CONTENT
+  content     String
+  status      String    @default("PENDING")
+  handledById String?
+  handledAt   DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([status, createdAt])
+}
+
+/// 标签屏蔽：屏蔽后，带该标签的条目不进入公开列表
+model BlockedTag {
+  userId    String
+  tagId     String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([userId, tagId])
+  @@index([tagId])
+}
+
+/// 屏蔽条目：用户主动隐藏某个作品
+model BlockedGame {
+  userId    String
+  gameId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  @@id([userId, gameId])
+}
+
+/// 讨论点赞
+model CommentLike {
+  id        String   @id @default(cuid())
+  commentId String
+  userId    String
+  createdAt DateTime @default(now())
+
+  comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([commentId, userId], map: "CommentLike_unique")
+}
+
+/// 评价点赞
+model RatingLike {
+  id        String   @id @default(cuid())
+  ratingId  String
+  userId    String
+  createdAt DateTime @default(now())
+
+  rating Rating @relation(fields: [ratingId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([ratingId, userId], map: "RatingLike_unique")
+}
+
+/// 资源点赞
+model ResourceLike {
+  id         String   @id @default(cuid())
+  resourceId String
+  userId     String
+  createdAt  DateTime @default(now())
+
+  resource Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([resourceId, userId], map: "ResourceLike_resourceId_userId_key")
+  @@index([resourceId], map: "ResourceLike_resourceId_idx")
+}
+
+/// 私聊会话：aId / bId 按固定顺序存储，保证同一对用户只有一条会话
+model Conversation {
+  id            String   @id @default(cuid())
+  aId           String
+  bId           String
+  status        String   @default("PENDING")
+  lastMessageAt DateTime @default(now())
+  createdAt     DateTime @default(now())
+
+  a        User            @relation("ConversationA", fields: [aId], references: [id], onDelete: Cascade)
+  b        User            @relation("ConversationB", fields: [bId], references: [id], onDelete: Cascade)
+  messages DirectMessage[]
+
+  @@unique([aId, bId], map: "Conversation_a_b_key")
+  @@index([bId], map: "Conversation_b_idx")
+}
+
+/// 私聊消息
+model DirectMessage {
+  id             String   @id @default(cuid())
+  conversationId String
+  senderId       String
+  body           String   @db.Text
+  read           Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt], map: "DirectMessage_conversation_idx")
+}
+
+/// 媒体库：按内容哈希去重
+model Media {
+  id           String   @id @default(cuid())
+  hash         String   @unique(map: "Media_hash_key")
+  key          String
+  url          String
+  filename     String
+  mimeType     String
+  size         Int      @default(0)
+  uploadedById String?
+  createdAt    DateTime @default(now())
+
+  @@index([createdAt], map: "Media_createdAt_idx")
+}
+
+/// 站内通知（与 Message 并存，供通知中心使用）
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   @default("SYSTEM")
+  title     String
+  body      String   @default("")
+  href      String?
+  read      Boolean  @default(false)
+  actorId   String?
+  createdAt DateTime @default(now())
+
+  user  User  @relation("NotificationUser", fields: [userId], references: [id], onDelete: Cascade)
+  actor User? @relation("NotificationActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt], map: "Notification_createdAt_idx")
+  @@index([userId, read], map: "Notification_userId_read_idx")
+}
+
+/// 支持正版：条目详情页的外部购买 / 商店链接
+model PurchaseLink {
+  id        String   @id @default(cuid())
+  gameId    String
+  label     String   @default("官方商店")
+  url       String
+  note      String?
+  createdAt DateTime @default(now())
+
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  @@index([gameId], map: "PurchaseLink_gameId_idx")
+}
+
+/* -------------------------------- 作品条目 ------------------------------- */
+
+model Company {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  name         String   @unique
+  /// 别名：日文名、罗马字、旧称（截图里的「别名」chips）
+  aliases      String[]
+  website      String?
+  /// 主语言，如「日本語」「简体中文」
+  mainLanguage String?
+  /// 所属地区 / 国家
+  region       String?
+  description  String?  @db.Text
+  logoUrl      String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  games Game[]
+
+  @@index([name])
+}
+
+model Game {
+  id           String @id @default(cuid())
+  slug         String @unique
+  title        String
+  /// 原名（通常为日文）
+  originalTitle String?
+  romanizedTitle String?
+  aliases      String[]
+
+  /// 剧情简介 / 档案说明
+  summary      String  @db.Text
+  coverUrl     String?
+  bannerUrl    String?
+  /// 游戏截图（最多 3 张），用于详情页展示
+  screenshots  String[]
+
+  releaseDate  DateTime?
+  /// 平均评分（0-10）
+  rating       Float   @default(0)
+  ratingCount  Int     @default(0)
+  viewCount    Int     @default(0)
+  downloadCount Int    @default(0)
+  favoriteCount Int    @default(0)
+
+  /// 是否全年龄条目
+  isSfw        Boolean @default(true)
+  /// 资源最近更新时间，列表默认按它排序
+  resourceUpdatedAt DateTime @default(now())
+
+  /// 运行平台：PC / PE / Android / iOS
+  platforms    String[]
+  /// 语言：简体中文 / 繁體中文 / 日本語
+  languages    String[]
+
+  companyId    String?
+  company      Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  creatorId    String?
+  creator      User?    @relation(fields: [creatorId], references: [id], onDelete: SetNull)
+
+  tags         GameTag[]
+  resources    Resource[]
+  comments     Comment[]
+  ratings      Rating[]
+  collections  Collection[]
+  purchaseLinks PurchaseLink[]
+  blockedBy    BlockedGame[]
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([companyId])
+  @@index([resourceUpdatedAt])
+  @@index([rating])
+}
+
+enum TagKind {
+  GENRE // 题材：纯爱、校园、奇幻
+  PLATFORM // 平台：PC、Android
+  LANGUAGE // 语言：简体中文
+  THEME // 叙事线索：夏日、青春
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      String   @unique
+  kind      TagKind  @default(GENRE)
+  /// 关联条目数，列表页直接展示，避免每次 count
+  createdAt DateTime @default(now())
+
+  games GameTag[]
+
+  blockedBy BlockedTag[]
+
+  @@index([kind])
+}
+
+model GameTag {
+  gameId String
+  tagId  String
+
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([gameId, tagId])
+  @@index([tagId])
+}
+
+/* --------------------------------- 资源 --------------------------------- */
+
+enum ResourceType {
+  GAME // 本体
+  PATCH // 补丁
+  CG // 图片素材
+  OTHER // 其他
+}
+
+enum ResourceProvider {
+  OFFICIAL // 官方来源
+  COMMUNITY // 社区提供
+}
+
+model Resource {
+  id            String           @id @default(cuid())
+  gameId        String
+  game          Game             @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  title         String
+  type          ResourceType     @default(GAME)
+  provider      ResourceProvider @default(OFFICIAL)
+  /// 只存元数据与指向官方/授权渠道的链接，不托管文件
+  url           String
+  size          String?
+  format        String?
+  version       String?
+  /// 网盘名称（自由文本：百度网盘 / 夸克 / PikPak / Google Drive …）
+  netdisk       String?
+  /// 网盘提取码
+  extractCode   String?
+  note          String?
+  likeCount     Int              @default(0)
+  downloadCount Int              @default(0)
+  authorId      String?
+  author        User?            @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  createdAt     DateTime         @default(now())
+
+  likes ResourceLike[]
+
+  @@index([gameId])
+  @@index([type])
+}
+
+/* ------------------------------- 社区互动 ------------------------------- */
+
+model Comment {
+  id        String   @id @default(cuid())
+  gameId    String
+  game      Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content   String   @db.Text
+  likeCount Int      @default(0)
+  createdAt DateTime @default(now())
+
+  likes CommentLike[]
+
+  @@index([gameId, createdAt])
+}
+
+model Rating {
+  id        String   @id @default(cuid())
+  gameId    String
+  game      Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  score     Int
+  createdAt DateTime @default(now())
+
+  likes RatingLike[]
+
+  @@unique([gameId, userId])
+  @@index([gameId])
+}
+
+model Collection {
+  id        String   @id @default(cuid())
+  gameId    String
+  game      Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([gameId, userId])
+  @@index([userId])
+}
+
+/* --------------------------------- 文档 --------------------------------- */
+
+enum DocCategory {
+  NOTICE // 公告
+  GUIDE // 使用指南
+  POLICY // 协议与政策
+  ABOUT // 关于项目
+}
+
+model Doc {
+  id            String      @id @default(cuid())
+  slug          String      @unique
+  title         String
+  summary       String?
+  content       String      @db.Text
+  category      DocCategory @default(GUIDE)
+  coverUrl      String?
+  /// 字数，用于列表展示
+  wordCount     Int         @default(0)
+  published     Boolean     @default(true)
+  authorId      String?
+  author        User?       @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([category, updatedAt])
+}
+
+/* --------------------------------- 消息 --------------------------------- */
+
+enum MessageType {
+  ALL // 全部消息
+  FOLLOW // 关注消息
+  MENTION // @ 消息
+  SYSTEM // 系统消息
+  PRIVATE // 私聊
+}
+
+model Message {
+  id        String      @id @default(cuid())
+  userId    String
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      MessageType @default(SYSTEM)
+  title     String
+  body      String      @db.Text
+  /// 跳转地址，如 /galgame/xxx
+  href      String?
+  read      Boolean     @default(false)
+  createdAt DateTime    @default(now())
+
+  @@index([userId, read])
+  @@index([userId, type])
+}
