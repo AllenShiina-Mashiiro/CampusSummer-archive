@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
@@ -45,6 +46,7 @@ async function Chat({
   params: PageProps<"/message/dm/[id]">["params"];
   searchParams: PageProps<"/message/dm/[id]">["searchParams"];
 }) {
+  await connection();
   const session = await getSession();
   const [{ id }, raw] = await Promise.all([params, searchParams]);
   if (!session) redirect(`/login?next=/message/dm/${id}`);
