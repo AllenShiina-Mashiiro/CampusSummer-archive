@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import Link from "next/link";
 import { Suspense } from "react";
 
@@ -42,6 +43,7 @@ export default function CreatorPage() {
 }
 
 async function OwnGames() {
+  await connection();
   const user = await requireCapability("creator.center");
 
   // 条目由全体创作者协作维护：这里列出全部条目，自己发布的排在最前
