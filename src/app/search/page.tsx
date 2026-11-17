@@ -70,8 +70,8 @@ async function SearchBox({ searchParams }: { searchParams: PageProps<"/search">[
   );
 }
 
-async function SearchResults({
-  await connection(); searchParams }: { searchParams: PageProps<"/search">["searchParams"] }) {
+async function SearchResults({ searchParams }: { searchParams: PageProps<"/search">["searchParams"] }) {
+  await connection();
   const params = (await searchParams) ?? {};
   const read = (key: string) => {
     const value = params[key];
