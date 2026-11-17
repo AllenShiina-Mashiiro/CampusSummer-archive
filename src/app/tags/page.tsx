@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { connection } from "next/server";
 import { Suspense } from "react";
 
 import { Breadcrumb, PageHeading } from "@/components/breadcrumb";
@@ -45,7 +46,8 @@ async function SearchArea({ searchParams }: { searchParams: PageProps<"/tags">["
   );
 }
 
-async function TagGrid({ searchParams }: { searchParams: PageProps<"/tags">["searchParams"] }) {
+async function TagGrid({
+  await connection(); searchParams }: { searchParams: PageProps<"/tags">["searchParams"] }) {
   const params = (await searchParams) ?? {};
   const q = Array.isArray(params.q) ? params.q[0] : params.q;
   const [all, blocked] = await Promise.all([listTags(q), getBlockedTagSlugs()]);
