@@ -39,8 +39,8 @@ export default function GalgameListPage({ searchParams }: PageProps<"/galgame">)
   );
 }
 
-async function GameBrowser({
-  await connection(); searchParams }: { searchParams: PageProps<"/galgame">["searchParams"] }) {
+async function GameBrowser({ searchParams }: { searchParams: PageProps<"/galgame">["searchParams"] }) {
+  await connection();
   const params = (await searchParams) ?? {};
 
   const sortParam = readParam(params.sort);
