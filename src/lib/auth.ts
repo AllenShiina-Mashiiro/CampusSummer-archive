@@ -71,14 +71,9 @@ export async function destroySession(): Promise<void> {
 }
 
 /**
- * 纯 HMAC 验签，不碰时间。
- *
- * 为什么不用 jose 的 jwtVerify：它内部会用 new Date() 计算当前时间去校验 exp/nbf，
- * 而 Next 16 在预渲染 / revalidatePath 触发的重渲染阶段会把 `new Date()` 判为
- * unstable value 并抛错（表现为删除条目时报 Blocking Route）。
- *
- * 签名完整性与伪造防护完全一致；过期由 Cookie 的 maxAge（浏览器侧）
- * 和 proxy 里的完整校验（请求时执行）共同保证。
+ * 使用纯 HMAC 验签，避免 jose 的 jwtVerify 在 Next 16 的部分重渲染阶段
+ * 读取系统时间时触发 unstable-value 错误；同时在这里显式检查 exp / nbf，
+ * 让页面、Server Actions 与 API 路由都执行服务端时效校验。
  */
 function verifySessionToken(token: string): Record<string, unknown> | null {
   const [header, payload, signature] = token.split(".");
