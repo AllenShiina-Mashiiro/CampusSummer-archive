@@ -10,16 +10,6 @@ import { SITE } from "@/lib/site";
 
 import "./globals.css";
 
-/**
- * 整站按请求渲染。
- *
- * 根布局里的顶栏需要读会话（cookie → jwtVerify），而 jwtVerify 会读当前时间校验过期，
- * 这在「预渲染」阶段属于不稳定值：一旦被预渲染命中，会报
- * `encountered the unstable value new Date()`，Suspense 边界失败后浏览器反复重取，
- * 表现就是页面持续闪烁。这里显式声明为阻塞路由，避免布局进入预渲染。
- */
-export const instant = false;
-
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   title: {
