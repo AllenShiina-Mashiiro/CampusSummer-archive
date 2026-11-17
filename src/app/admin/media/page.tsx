@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { Suspense } from "react";
 
 import { cleanupOrphansAction } from "@/app/admin/media-actions";
@@ -31,6 +32,7 @@ export default function AdminMediaPage({ searchParams }: PageProps<"/admin/media
 }
 
 async function MediaOverview({ searchParams }: { searchParams: PageProps<"/admin/media">["searchParams"] }) {
+  await connection();
   await requireCapability("site.settings");
 
   const params = (await searchParams) ?? {};
