@@ -1,4 +1,5 @@
 import { updateCompanyAction } from "@/app/companies/company-actions";
+import { connection } from "next/server";
 import { fieldClass } from "@/components/settings-card";
 import { getSession } from "@/lib/auth";
 import { can } from "@/lib/permissions";
@@ -11,6 +12,7 @@ export async function CompanyEditor({
   slug: string;
   values: Record<string, string>;
 }) {
+  await connection();
   const session = await getSession();
   if (!session || !can(session.role, "game.publish")) return null;
 
