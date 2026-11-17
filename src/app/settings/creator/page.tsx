@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
@@ -19,6 +20,7 @@ export default function CreatorApplyPage({ searchParams }: PageProps<"/settings/
 }
 
 async function ApplyForm({ searchParams }: { searchParams: PageProps<"/settings/creator">["searchParams"] }) {
+  await connection();
   const me = await requireUser();
   const params = (await searchParams) ?? {};
 
