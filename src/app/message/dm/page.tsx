@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
@@ -44,6 +45,7 @@ export default function DmListPage() {
 }
 
 async function DmList() {
+  await connection();
   const session = await getSession();
   if (!session) redirect("/login?next=/message/dm");
 
