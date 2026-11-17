@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import Link from "next/link";
 import { Suspense } from "react";
 
@@ -29,6 +30,7 @@ const SORTS = {
 };
 
 async function GamesTable({ searchParams }: { searchParams: PageProps<"/admin/games">["searchParams"] }) {
+  await connection();
   await requireAdmin();
 
   const params = (await searchParams) ?? {};
