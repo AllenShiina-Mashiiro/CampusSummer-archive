@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { Suspense } from "react";
 
 import { Breadcrumb, PageHeading } from "@/components/breadcrumb";
@@ -31,6 +32,7 @@ export default function DiscussionsPage() {
 }
 
 async function DiscussionGrid() {
+  await connection();
   const blocked = await getBlockedTagSlugs();
   const list = await listGames({ take: 24, excludeTags: blocked });
 
