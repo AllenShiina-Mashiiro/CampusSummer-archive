@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 import { Suspense } from "react";
 
 import { Breadcrumb, PageHeading } from "@/components/breadcrumb";
@@ -33,6 +34,7 @@ export default function TagDetailPage(props: PageProps<"/tags/[slug]">) {
 }
 
 async function TagFeed({
+  await connection();
   params,
   searchParams,
 }: {
