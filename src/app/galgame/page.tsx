@@ -1,6 +1,7 @@
 ﻿import { Suspense } from "react";
 
 import { Breadcrumb, PageHeading } from "@/components/breadcrumb";
+import { connection } from "next/server";
 import { FilterBar } from "@/components/filter-bar";
 import { GameGrid, GameGridSkeleton } from "@/components/game-card";
 import { Pagination } from "@/components/pagination";
@@ -38,7 +39,8 @@ export default function GalgameListPage({ searchParams }: PageProps<"/galgame">)
   );
 }
 
-async function GameBrowser({ searchParams }: { searchParams: PageProps<"/galgame">["searchParams"] }) {
+async function GameBrowser({
+  await connection(); searchParams }: { searchParams: PageProps<"/galgame">["searchParams"] }) {
   const params = (await searchParams) ?? {};
 
   const sortParam = readParam(params.sort);
