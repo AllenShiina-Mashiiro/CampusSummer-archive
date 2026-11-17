@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { Suspense } from "react";
 
 import { requireCapability } from "@/lib/admin-guard";
@@ -29,6 +30,7 @@ export default function AdminLogsPage() {
 }
 
 async function LogList() {
+  await connection();
   await requireCapability("logs.view");
   const logs = await listLogs(100);
 
