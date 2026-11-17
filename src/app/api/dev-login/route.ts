@@ -15,7 +15,8 @@ export async function GET(request: Request) {
 
   const url = new URL(request.url);
   const username = url.searchParams.get("as") ?? "allen";
-  const next = url.searchParams.get("next") ?? "/";
+  const rawNext = url.searchParams.get("next") ?? "/";
+  const next = rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/";
   const origin = requestOrigin(request);
 
   const user = await db.user.findUnique({
