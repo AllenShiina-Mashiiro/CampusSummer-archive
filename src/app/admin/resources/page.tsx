@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { Suspense } from "react";
 
 import { AdminTable, Td, Th } from "@/components/admin/admin-placeholder";
@@ -31,6 +32,7 @@ async function ResourcesTable({
 }: {
   searchParams: PageProps<"/admin/resources">["searchParams"];
 }) {
+  await connection();
   await requireAdmin();
 
   const params = (await searchParams) ?? {};
