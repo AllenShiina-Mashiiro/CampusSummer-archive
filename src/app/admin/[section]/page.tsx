@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 import { Suspense } from "react";
 
 import { AdminPlaceholder } from "@/components/admin/admin-placeholder";
@@ -82,6 +83,7 @@ export default async function AdminSectionPage({
 }
 
 async function Content({ meta }: { meta: { title: string; description: string } }) {
+  await connection();
   await requireAdmin();
   return <AdminPlaceholder title={meta.title} description={meta.description} />;
 }
