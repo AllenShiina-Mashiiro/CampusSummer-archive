@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { Suspense } from "react";
 
 import {
@@ -36,6 +37,7 @@ async function SettingsForm({
 }: {
   searchParams: PageProps<"/admin/settings">["searchParams"];
 }) {
+  await connection();
   const actor = await requireCapability("site.settings");
 
   const params = (await searchParams) ?? {};
