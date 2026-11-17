@@ -16,24 +16,29 @@ const ERRORS: Record<string, string> = {
 
 export default function LoginPage({ searchParams }: PageProps<"/login">) {
   return (
-    <div className="mx-auto flex w-full max-w-[400px] flex-col justify-center px-6 py-16">
-      <div className="text-center">
-        <h1 className="text-[25px] font-semibold tracking-tight text-ink">登录 {SITE.name}</h1>
-        <p className="mt-2 text-[14px] text-muted">整理条目、参与讨论、记录签到</p>
-      </div>
+    <div className="mx-auto flex w-full max-w-[420px] flex-col justify-center px-4 py-12 sm:px-6 sm:py-16">
+      {/* 登录页整块做成一张玻璃卡：标题和「立即注册」也压在同一层实色上 */}
+      <div className="glass-panel rounded-[20px] p-5 sm:p-6">
+        <div className="text-center">
+          <h1 className="text-[24px] font-semibold tracking-tight text-ink sm:text-[25px]">
+            登录 {SITE.name}
+          </h1>
+          <p className="mt-2 text-[13.5px] text-muted sm:text-[14px]">整理条目、参与讨论、记录签到</p>
+        </div>
 
-      <div className="mt-8 rounded-2xl border border-line bg-surface p-6">
-        <Suspense fallback={<div className="h-64 animate-pulse rounded-xl bg-subtle" />}>
-          <LoginForm searchParams={searchParams} />
-        </Suspense>
-      </div>
+        <div className="mt-6">
+          <Suspense fallback={<div className="h-64 animate-pulse rounded-xl bg-subtle" />}>
+            <LoginForm searchParams={searchParams} />
+          </Suspense>
+        </div>
 
-      <p className="mt-5 text-center text-[13px] text-faint">
-        还没有账号？
-        <Link href="/register" className="text-primary-strong hover:underline">
-          立即注册
-        </Link>
-      </p>
+        <p className="mt-4 text-center text-[13px] text-muted">
+          还没有账号？
+          <Link href="/register" className="ml-1 text-primary-strong hover:underline">
+            立即注册
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }

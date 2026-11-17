@@ -158,7 +158,8 @@ async function SettingsForm({
                 className={`${fieldClass} mt-1.5`}
               />
               <span className="mt-1.5 block text-[12.5px] leading-relaxed text-faint">
-                默认 15；想让背景图更清楚填 0-20，想优先保证文字对比填 40-70。
+                数值越大遮罩越厚。浅色与深色会各自换算（同一数值下深色更厚），背景图还会轻微虚化，
+                避免插画细节盖过正文。默认 15，想让插画更清楚填 0-20，优先保证文字对比填 40-70。
               </span>
             </label>
           </div>

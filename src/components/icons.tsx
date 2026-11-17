@@ -88,6 +88,14 @@ export const ChevronRightIcon = (p: IconProps) => (
   </Svg>
 );
 
+/** 汉堡菜单：移动端抽屉入口 */
+export const MenuIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M4 7h16M4 12h16M4 17h16" />
+  </Svg>
+);
+
+
 export const ChevronDownIcon = (p: IconProps) => (
   <Svg {...p}>
     <path d="m6 9 6 6 6-6" />

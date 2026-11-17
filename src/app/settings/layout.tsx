@@ -7,17 +7,19 @@ import { SettingsNav } from "@/components/settings-nav";
  */
 export default function SettingsLayout({ children }: LayoutProps<"/settings">) {
   return (
-    <div className="mx-auto w-full max-w-[1240px] px-6 py-6">
+    <div className="mx-auto w-full max-w-[1240px] px-4 py-5 sm:px-6 sm:py-6">
       <Breadcrumb items={[{ label: "用户设置" }]} />
 
-      <div className="mt-4">
-        <h1 className="text-[25px] font-semibold tracking-tight text-ink">账户设置</h1>
-        <p className="mt-1.5 text-[14px] text-muted">
+      <div className="page-head mt-4">
+        <h1 className="text-[24px] font-semibold tracking-tight text-ink sm:text-[25px]">
+          账户设置
+        </h1>
+        <p className="mt-1.5 text-[13.5px] text-muted sm:text-[14px]">
           按分类管理个人资料、账号安全、通知隐私与内容偏好。
         </p>
       </div>
 
-      <div className="mt-6 grid gap-5 lg:grid-cols-[240px_1fr]">
+      <div className="mt-5 grid gap-5 lg:grid-cols-[240px_1fr]">
         <SettingsNav />
         <div className="min-w-0">{children}</div>
       </div>

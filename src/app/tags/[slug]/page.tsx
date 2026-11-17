@@ -18,7 +18,7 @@ export async function generateMetadata(props: PageProps<"/tags/[slug]">) {
 
 export default function TagDetailPage(props: PageProps<"/tags/[slug]">) {
   return (
-    <div className="mx-auto w-full max-w-[1240px] px-6 py-6">
+    <div className="mx-auto w-full max-w-[1240px] px-4 py-5 sm:px-6 sm:py-6">
       <Suspense
         fallback={
           <div className="animate-pulse">
@@ -38,9 +38,10 @@ async function TagFeed({
   searchParams,
 }: {
   params: PageProps<"/tags/[slug]">["params"];
-  await connection();
   searchParams: PageProps<"/tags/[slug]">["searchParams"];
 }) {
+  await connection();
+
   const [{ slug }, raw] = await Promise.all([params, searchParams]);
   const tag = await getTagBySlug(slug);
   if (!tag) notFound();

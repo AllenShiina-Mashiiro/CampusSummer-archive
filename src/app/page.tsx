@@ -24,50 +24,30 @@ export default async function HomePage() {
   const settings = await getSiteSettings();
 
   return (
-    <div className="mx-auto w-full max-w-[1240px] px-6 py-6">
-      {/* 左列：介绍卡 + 三个入口；右列：公告横幅通高，和参考站版式一致 */}
-      <div className="grid items-stretch gap-4 lg:grid-cols-2">
-        <div className="flex flex-col gap-4">
+    <div className="mx-auto w-full max-w-[1240px] px-4 py-5 sm:px-6 sm:py-6">
+      {/* 左列：介绍卡 + 三个入口；右列：公告横幅通高。窄屏直接上下堆叠 */}
+      <div className="grid items-stretch gap-4 md:grid-cols-2">
+        <div className="flex min-w-0 flex-col gap-4">
           <HeroCard title={settings.heroTitle} description={settings.heroDescription} />
           <QuickLinks />
         </div>
-        <Suspense fallback={<div className="min-h-[240px] animate-pulse rounded-2xl bg-subtle" />}>
+        <Suspense
+          fallback={<div className="min-h-[260px] animate-pulse rounded-[18px] bg-card" />}
+        >
           <HomeActivity />
         </Suspense>
       </div>
 
-      <section className="mt-8">
-        <div className="mb-4 flex items-end justify-between">
-          <h2 className="rounded-md bg-canvas/40 px-2 py-0.5 text-[20px] font-semibold tracking-tight text-ink backdrop-blur-sm">
-            最新游戏
-          </h2>
-          <Link
-            href="/galgame"
-            className="flex items-center gap-1 rounded-md bg-canvas/40 px-2 py-0.5 text-[14px] text-muted backdrop-blur-sm transition-colors hover:text-primary-strong"
-          >
-            查看更多
-            <ChevronRightIcon size={14} />
-          </Link>
-        </div>
+      <section className="mt-7 sm:mt-8">
+        <SectionBar title="最新游戏" href="/galgame" />
 
         <Suspense fallback={<GameGridSkeleton count={8} />}>
           <LatestGames />
         </Suspense>
       </section>
 
-      <section className="mt-10">
-        <div className="mb-4 flex items-end justify-between">
-          <h2 className="rounded-md bg-canvas/40 px-2 py-0.5 text-[20px] font-semibold tracking-tight text-ink backdrop-blur-sm">
-            最新补丁
-          </h2>
-          <Link
-            href="/galgame"
-            className="flex items-center gap-1 rounded-md bg-canvas/40 px-2 py-0.5 text-[14px] text-muted backdrop-blur-sm transition-colors hover:text-primary-strong"
-          >
-            查看更多
-            <ChevronRightIcon size={14} />
-          </Link>
-        </div>
+      <section className="mt-8 sm:mt-10">
+        <SectionBar title="最新补丁" href="/galgame" />
 
         <Suspense fallback={<PatchSkeleton />}>
           <LatestPatches />
@@ -88,70 +68,49 @@ function HeroCard({ title, description }: { title: string; description: string }
     "非商业的作品与创作脉络整理项目，条目化收录作品、会社、版本与术语。";
 
   return (
-    <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#eef4ff] via-[#f1f0ff] to-[#f7effd] p-6 dark:from-[#151b2a] dark:via-[#191a2e] dark:to-[#1d1830]">
-      <span className="inline-flex items-center gap-1.5 rounded-full bg-white/70 px-2.5 py-1 text-[13px] font-medium text-primary-strong backdrop-blur dark:bg-white/10 dark:text-primary">
-        <SparklesIcon size={13} />
-        欢迎来到 {SITE.name}
-      </span>
+    <section className="glass-panel relative overflow-hidden rounded-[18px] p-5 sm:p-6">
+      {/* 品牌色薄雾：让玻璃卡和背景插画之间有过渡，而不是一张纯白卡片贴上去 */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(59,130,246,0.12),rgba(124,58,237,0.1)_52%,rgba(236,72,153,0.08))] dark:bg-[linear-gradient(135deg,rgba(59,130,246,0.2),rgba(124,58,237,0.18)_52%,rgba(236,72,153,0.14))]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -right-12 -top-16 h-44 w-44 rounded-full bg-[radial-gradient(circle,rgba(124,58,237,0.2),transparent_68%)] dark:bg-[radial-gradient(circle,rgba(167,139,250,0.26),transparent_68%)]"
+      />
 
-      <h1 className="mt-4 text-[32px] leading-[1.25] font-bold tracking-tight">
-        <span className="bg-gradient-to-r from-primary-strong via-[#6366f1] to-violet bg-clip-text text-transparent">
-          {heroTitle}
+      <div className="relative">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-hairline bg-sheen px-2.5 py-1 text-[12.5px] font-medium text-primary-strong backdrop-blur-sm">
+          <SparklesIcon size={13} />
+          欢迎来到 {SITE.name}
         </span>
-      </h1>
 
-      <p className="mt-3 whitespace-pre-line text-[15px] leading-relaxed text-ink-soft">
-        {heroDescription}
-      </p>
+        <h1 className="mt-3.5 text-[25px] leading-[1.22] font-bold tracking-tight sm:text-[29px] lg:text-[32px]">
+          <span className="bg-gradient-to-r from-[#1d4ed8] via-[#6d28d9] to-[#a21caf] bg-clip-text text-transparent dark:from-[#93c5fd] dark:via-[#c4b5fd] dark:to-[#f0abfc]">
+            {heroTitle}
+          </span>
+        </h1>
 
-      <div className="mt-6 flex items-center gap-3">
-        <Link
-          href="/api/random"
-          className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-[15px] font-medium text-white transition-colors hover:bg-primary-strong"
-        >
-          <GamepadIcon size={17} />
-          随机一部游戏
-        </Link>
-        <Link
-          href="/docs/getting-started"
-          aria-label="帮助文档"
-          className="flex h-[42px] w-[42px] items-center justify-center rounded-xl bg-white/80 text-violet shadow-sm transition-colors hover:bg-white dark:bg-white/10"
-        >
-          <BookIcon size={19} />
-        </Link>
-      </div>
-    </section>
-  );
-}
+        <p className="mt-2.5 whitespace-pre-line text-[14px] leading-relaxed text-ink-soft sm:text-[15px]">
+          {heroDescription}
+        </p>
 
-function NoticeCard() {
-  return (
-    <section className="relative flex min-h-[240px] flex-col justify-end overflow-hidden rounded-2xl border border-line">
-      <div className="absolute inset-0">
-        <img src="/covers/banner.svg" alt="" className="h-full w-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-black/5 to-transparent" />
-      </div>
-
-      <div className="relative p-3.5">
-        <div className="rounded-xl bg-surface/95 p-3.5 backdrop-blur-sm">
-          <div className="flex items-center gap-2">
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-violet to-primary text-[10px] font-semibold text-white">
-              T
-            </span>
-            <span className="text-[14px] font-medium text-ink">Tobikin</span>
-          </div>
-
-          <h2 className="mt-2 text-[17px] font-semibold text-ink">捐赠赞助和财务公开</h2>
-          <p className="mt-1.5 line-clamp-2 text-[13.5px] leading-relaxed text-muted">
-            说明本站的非商业运营原则、独立维护的财务与服务器开销情况。
-          </p>
-
-          <div className="mt-2.5 flex items-center gap-2 text-[13px]">
-            <span className="rounded-md bg-primary-soft px-1.5 py-0.5 font-medium text-primary-strong">
-              公告
-            </span>
-            <span className="text-faint">1 年前</span>
-          </div>
+        <div className="mt-5 flex flex-wrap items-center gap-2.5 sm:mt-6 sm:gap-3">
+          <Link
+            href="/api/random"
+            className="inline-flex h-11 items-center gap-2 rounded-xl bg-primary px-4 text-[14.5px] font-medium text-white shadow-[0_12px_26px_-14px_rgba(37,99,235,0.95)] transition-colors hover:bg-primary-strong"
+          >
+            <GamepadIcon size={17} />
+            随机一部游戏
+          </Link>
+          <Link
+            href="/docs/getting-started"
+            aria-label="帮助文档"
+            title="帮助文档"
+            className="glass-card flex h-11 w-11 items-center justify-center rounded-xl text-violet transition-colors hover:text-primary-strong"
+          >
+            <BookIcon size={19} />
+          </Link>
         </div>
       </div>
     </section>
@@ -160,35 +119,75 @@ function NoticeCard() {
 
 function QuickLinks() {
   const items = [
-    { href: "/tags", label: "标签", icon: <TagIcon size={17} />, tone: "bg-[#eef4ff] text-[#2563eb]" },
+    {
+      href: "/tags",
+      label: "标签",
+      icon: <TagIcon size={16} />,
+      tone: "bg-primary-soft text-primary-strong",
+    },
     {
       href: "/discussions",
       label: "讨论",
-      icon: <CommentIcon size={17} />,
-      tone: "bg-[#f6efff] text-[#7c3aed]",
+      icon: <CommentIcon size={16} />,
+      tone: "bg-violet-soft text-violet",
     },
     {
       href: "/docs",
       label: "文档",
-      icon: <BookIcon size={17} />,
-      tone: "bg-[#ecfdf3] text-[#15803d]",
+      icon: <BookIcon size={16} />,
+      tone: "bg-mint-soft text-mint",
     },
   ];
 
   return (
-    <div className="grid grid-cols-3 gap-3">
+    <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
       {items.map((item) => (
         <Link
           key={item.href}
           href={item.href}
-          className="flex items-center justify-center gap-2 rounded-xl border border-line bg-surface py-3 text-[14.5px] font-medium text-ink-soft transition-colors hover:border-primary/30 hover:text-primary-strong"
+          className="glass-card card-hover flex min-w-0 items-center justify-center gap-2 rounded-xl py-2.5 text-[13.5px] font-medium text-ink-soft transition-colors hover:text-ink sm:py-3 sm:text-[14.5px]"
         >
-          <span className={`flex h-7 w-7 items-center justify-center rounded-lg ${item.tone}`}>
+          <span
+            className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${item.tone}`}
+          >
             {item.icon}
           </span>
-          {item.label}
+          <span className="truncate">{item.label}</span>
         </Link>
       ))}
+    </div>
+  );
+}
+
+/** 分节标题：标题与「查看更多」共用同一条玻璃条，避免文字直接压在插画上 */
+function SectionBar({
+  title,
+  href,
+  label = "查看更多",
+}: {
+  title: string;
+  href: string;
+  label?: string;
+}) {
+  return (
+    <div className="section-bar mb-3.5 sm:mb-4">
+      <h2 className="flex min-w-0 items-center gap-2 text-[17px] font-semibold tracking-tight text-ink sm:text-[19px]">
+        <span
+          aria-hidden
+          className="h-4 w-1 shrink-0 rounded-full bg-gradient-to-b from-primary to-violet"
+        />
+        <span className="truncate">{title}</span>
+      </h2>
+      <Link
+        href={href}
+        className="group inline-flex h-10 shrink-0 items-center gap-0.5 rounded-lg px-2.5 text-[13px] font-medium text-muted transition-colors hover:bg-subtle hover:text-primary-strong sm:h-9 sm:text-[13.5px]"
+      >
+        {label}
+        <ChevronRightIcon
+          size={14}
+          className="transition-transform group-hover:translate-x-0.5"
+        />
+      </Link>
     </div>
   );
 }
@@ -214,28 +213,17 @@ async function HomeFriends() {
   if (friends.length === 0) return null;
 
   return (
-    <section className="mt-10">
-      <div className="mb-4 flex items-end justify-between">
-        <h2 className="rounded-md bg-canvas/40 px-2 py-0.5 text-[20px] font-semibold tracking-tight text-ink backdrop-blur-sm">
-          友情链接
-        </h2>
-        <Link
-          href="/friends"
-          className="flex items-center gap-1 rounded-md bg-canvas/40 px-2 py-0.5 text-[14px] text-muted backdrop-blur-sm transition-colors hover:text-primary-strong"
-        >
-          查看全部
-          <ChevronRightIcon size={14} />
-        </Link>
-      </div>
+    <section className="mt-8 sm:mt-10">
+      <SectionBar title="友情链接" href="/friends" label="查看全部" />
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {friends.slice(0, 8).map((friend) => (
           <a
             key={friend.id}
             href={friend.url}
             target={friend.url.startsWith("http") ? "_blank" : undefined}
             rel="noopener noreferrer"
-            className="card-hover flex flex-col overflow-hidden rounded-[14px] border border-line bg-surface"
+            className="glass-card card-hover flex flex-col overflow-hidden rounded-[14px]"
           >
             <div className="aspect-[16/9] overflow-hidden bg-subtle">
               {friend.imageUrl ? (
@@ -246,16 +234,18 @@ async function HomeFriends() {
                   className="h-full w-full object-cover"
                 />
               ) : (
-                <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#bfdbfe] to-[#6366f1] text-[26px] font-semibold text-white">
+                <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#bfdbfe] to-[#6366f1] text-[24px] font-semibold text-white">
                   {friend.title.slice(0, 1)}
                 </div>
               )}
             </div>
 
-            <div className="px-3.5 py-3">
-              <h3 className="truncate text-[15px] font-semibold text-ink">{friend.title}</h3>
+            <div className="min-w-0 px-3 py-2.5 sm:px-3.5 sm:py-3">
+              <h3 className="truncate text-[14px] font-semibold text-ink sm:text-[15px]">
+                {friend.title}
+              </h3>
               {friend.description && (
-                <p className="clamp-2 mt-1.5 text-[13px] leading-relaxed text-muted">
+                <p className="clamp-2 mt-1 text-[12.5px] leading-relaxed text-muted sm:mt-1.5 sm:text-[13px]">
                   {friend.description}
                 </p>
               )}
@@ -273,19 +263,19 @@ async function LatestPatches() {
 
   if (patches.length === 0) {
     return (
-      <p className="rounded-2xl border border-dashed border-line bg-surface py-10 text-center text-[14px] text-muted">
+      <p className="glass-card rounded-[14px] border-dashed py-9 text-center text-[14px] text-muted">
         还没有补丁资源
       </p>
     );
   }
 
   return (
-    <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+    <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
       {patches.map((patch) => (
         <Link
           key={patch.id}
           href={`/galgame/${patch.game.slug}?tab=resources`}
-          className="card-hover group overflow-hidden rounded-[14px] border border-line bg-surface"
+          className="glass-card card-hover group overflow-hidden rounded-[14px]"
         >
           <div className="relative aspect-[16/10] overflow-hidden bg-subtle">
             {patch.game.coverUrl && (
@@ -296,19 +286,23 @@ async function LatestPatches() {
                 className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
               />
             )}
-            <span className="absolute left-2 top-2 rounded-md bg-primary px-1.5 py-0.5 text-[11.5px] font-medium text-white">
+            <span className="absolute left-2 top-2 rounded-md bg-primary px-1.5 py-0.5 text-[11px] font-medium text-white shadow-sm">
               补丁
             </span>
           </div>
 
-          <div className="px-3 py-3">
-            <h3 className="clamp-2 text-[15px] font-semibold leading-[1.45] text-ink transition-colors group-hover:text-primary-strong">
+          <div className="px-2.5 py-2.5 sm:px-3 sm:py-3">
+            <h3 className="clamp-2 text-[14px] font-semibold leading-[1.45] text-ink transition-colors group-hover:text-primary-strong sm:text-[15px]">
               {patch.title}
             </h3>
-            <p className="mt-1.5 truncate text-[13px] text-muted">{patch.game.title}</p>
-            <div className="mt-2 flex items-center gap-2 text-[12.5px] text-faint">
+            <p className="mt-1 truncate text-[12px] text-muted sm:mt-1.5 sm:text-[13px]">
+              {patch.game.title}
+            </p>
+            <div className="mt-2 flex items-center gap-2 text-[11.5px] text-faint sm:text-[12.5px]">
               {patch.format && (
-                <span className="rounded-md bg-violet-soft px-1.5 py-0.5 text-violet">{patch.format}</span>
+                <span className="rounded-md bg-violet-soft px-1.5 py-0.5 text-violet">
+                  {patch.format}
+                </span>
               )}
               <TimeAgo value={patch.createdAt} />
             </div>
@@ -321,9 +315,9 @@ async function LatestPatches() {
 
 function PatchSkeleton() {
   return (
-    <div className="grid animate-pulse grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+    <div className="grid animate-pulse grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
       {Array.from({ length: 4 }).map((_, index) => (
-        <div key={index} className="overflow-hidden rounded-[14px] border border-line bg-surface">
+        <div key={index} className="glass-card overflow-hidden rounded-[14px]">
           <div className="aspect-[16/10] bg-subtle" />
           <div className="space-y-2 px-3 py-3">
             <div className="h-3.5 w-4/5 rounded bg-subtle" />

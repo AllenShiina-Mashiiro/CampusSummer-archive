@@ -56,7 +56,7 @@ export function FilterBar({ total }: { total: number }) {
   return (
     <div
       ref={containerRef}
-      className="my-5 flex flex-wrap items-center gap-2 rounded-xl border border-line bg-surface px-3 py-2.5"
+      className="glass-card my-5 flex flex-wrap items-center gap-2 rounded-xl px-3 py-2.5"
     >
       <div className="relative">
         <button

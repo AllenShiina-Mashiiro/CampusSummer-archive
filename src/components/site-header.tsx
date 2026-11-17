@@ -5,6 +5,7 @@ import { connection } from "next/server";
 import { Suspense } from "react";
 
 import { BellIcon, DiceIcon, SearchIcon } from "@/components/icons";
+import { MobileNav } from "@/components/mobile-nav";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { UserMenu } from "@/components/user-menu";
 import { getCurrentUser } from "@/lib/auth";
@@ -15,30 +16,33 @@ export async function SiteHeader() {
   const settings = await getSiteSettings();
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-canvas/85 backdrop-blur-md">
-      <div className="mx-auto flex h-16 w-full max-w-[1240px] items-center gap-8 px-6">
-        <Link href="/" className="flex shrink-0 items-center gap-2">
+    <header className="glass-bar sticky top-0 z-50">
+      <div className="mx-auto flex h-16 w-full max-w-[1240px] items-center gap-2 px-4 sm:gap-6 sm:px-6">
+        <Link href="/" className="flex min-w-0 shrink-0 items-center gap-2">
           <LogoMark logoUrl={settings.logoUrl} />
-          <span className="text-[18px] font-bold tracking-tight text-ink">{settings.siteName}</span>
+          <span className="truncate text-[17px] font-bold tracking-tight text-ink sm:text-[18px]">
+            {settings.siteName}
+          </span>
         </Link>
 
-        <nav className="flex items-center gap-7 text-[16px] text-ink-soft">
+        {/* 桌面端导航；窄屏收进右侧菜单，避免中文导航在手机上和图标挤成一条 */}
+        <nav aria-label="主导航" className="hidden items-center gap-1 text-[15.5px] text-ink-soft lg:flex">
           {NAV_ITEMS.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="transition-colors hover:text-primary-strong"
+              className="rounded-lg px-2.5 py-2 transition-colors hover:bg-subtle hover:text-ink"
             >
               {item.label}
             </Link>
           ))}
         </nav>
 
-        <div className="ml-auto flex items-center gap-1">
+        <div className="ml-auto flex items-center gap-0.5 sm:gap-1">
           <Link
             href="/search"
             aria-label="搜索"
-            className="flex h-9 w-9 items-center justify-center rounded-full text-ink-soft transition-colors hover:bg-subtle hover:text-ink"
+            className="hidden h-10 w-10 items-center justify-center rounded-full text-ink-soft transition-colors hover:bg-subtle hover:text-ink sm:flex sm:h-9 sm:w-9"
           >
             <SearchIcon size={19} />
           </Link>
@@ -47,7 +51,7 @@ export async function SiteHeader() {
             aria-label="随机一部游戏"
             title="随机一部游戏"
             prefetch={false}
-            className="flex h-9 w-9 items-center justify-center rounded-full text-ink-soft transition-colors hover:bg-subtle hover:text-ink"
+            className="hidden h-10 w-10 items-center justify-center rounded-full text-ink-soft transition-colors hover:bg-subtle hover:text-ink md:flex md:h-9 md:w-9"
           >
             <DiceIcon size={19} />
           </Link>
@@ -57,7 +61,7 @@ export async function SiteHeader() {
               <Link
                 href="/message"
                 aria-label="消息"
-                className="flex h-9 w-9 items-center justify-center rounded-full text-ink-soft transition-colors hover:bg-subtle hover:text-ink"
+                className="flex h-10 w-10 items-center justify-center rounded-full text-ink-soft transition-colors hover:bg-subtle hover:text-ink sm:h-9 sm:w-9"
               >
                 <BellIcon size={19} />
               </Link>
@@ -75,6 +79,8 @@ export async function SiteHeader() {
               }}
             />
           </Suspense>
+
+          <MobileNav />
         </div>
       </div>
     </header>
@@ -91,7 +97,7 @@ async function BellArea() {
       <Link
         href="/message"
         aria-label="消息"
-        className="flex h-9 w-9 items-center justify-center rounded-full text-ink-soft transition-colors hover:bg-subtle hover:text-ink"
+        className="flex h-10 w-10 items-center justify-center rounded-full text-ink-soft transition-colors hover:bg-subtle hover:text-ink sm:h-9 sm:w-9"
       >
         <BellIcon size={19} />
       </Link>
@@ -140,7 +146,7 @@ function LogoMark({ logoUrl }: { logoUrl: string }) {
   }
 
   return (
-    <span className="relative flex h-7 w-7 items-center justify-center">
+    <span className="relative flex h-7 w-7 shrink-0 items-center justify-center">
       <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden>
         <defs>
           <linearGradient id="csa-logo" x1="4" y1="2" x2="24" y2="26" gradientUnits="userSpaceOnUse">

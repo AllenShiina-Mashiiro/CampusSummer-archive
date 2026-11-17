@@ -14,8 +14,8 @@ export async function SiteFooter() {
   const settings = await getSiteSettings();
 
   return (
-    <footer className="mt-16 border-t border-line">
-      <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-5 px-6 py-7 text-[14px] text-muted lg:flex-row lg:items-center lg:justify-between">
+    <footer className="mt-14 border-t border-hairline bg-[var(--color-glass)] backdrop-blur-xl">
+      <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-4 px-4 py-7 text-[13.5px] text-muted sm:px-6 sm:text-[14px] lg:flex-row lg:items-center lg:justify-between lg:gap-5">
         <div className="flex items-center gap-2.5">
           <span className="text-[16px]" aria-hidden>
             ⁂
@@ -25,7 +25,7 @@ export async function SiteFooter() {
           </span>
         </div>
 
-        <nav className="flex flex-wrap items-center gap-x-6 gap-y-2">
+        <nav aria-label="页脚导航" className="flex flex-wrap items-center gap-x-6 gap-y-2">
           {centerLinks.map((item) => (
             <Link key={item.href} href={item.href} className="transition-colors hover:text-ink">
               {item.label}

@@ -7,70 +7,113 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
- * 设计令牌：复刻参考站的浅色卡片体系。
- * 颜色全部走 CSS 变量，`@theme` 把它们暴露成 bg-surface / text-ink 这类工具类；
- * 暗色模式只需在 .dark 下覆盖同一组变量，组件不用写 dark: 前缀。
+ * 设计令牌。
+ *
+ * 颜色分三层，避免「一层白雾盖全站」那种发灰的观感：
+ *   1. canvas / ink / line —— 不透明的基础层，弹窗、表单、编辑器等需要绝对清晰的面板；
+ *   2. glass / card / hairline —— 半透明层，只给「浮在背景图上的内容卡」用，
+ *      让背景图的颜色透一点点进来，卡片才不会像贴上去的白纸；
+ *   3. primary / violet / mint… —— 强调色，深浅色各有一套亮度。
+ *
+ * 半透明值刻意写成固定 alpha，而不是 bg-surface/90：
+ * 这样深色覆盖时只需要替换同一个变量，组件里不用写两套颜色。
  */
 @theme {
   --color-surface: #ffffff;
   --color-canvas: #ffffff;
-  --color-subtle: #f6f7f9;
-  --color-line: #eceef1;
+  --color-subtle: #f4f6fa;
+  --color-line: #e6e9ef;
 
-  --color-ink: #111827;
-  --color-ink-soft: #374151;
-  --color-muted: #6b7280;
-  --color-faint: #9ca3af;
+  --color-ink: #101828;
+  --color-ink-soft: #344054;
+  --color-muted: #5b6574;
+  --color-faint: #8792a3;
 
   --color-primary: #3b82f6;
-  --color-primary-strong: #2563eb;
-  --color-primary-soft: #eff6ff;
+  --color-primary-strong: #2463eb;
+  --color-primary-soft: #eaf2ff;
 
   --color-violet: #7c3aed;
-  --color-violet-soft: #f3e8ff;
+  --color-violet-soft: #f2e9ff;
   --color-mint: #15803d;
   --color-mint-soft: #dcfce7;
   --color-amber: #f59e0b;
   --color-rose: #e11d48;
   --color-rose-soft: #ffe4e6;
 
+  /* 半透明层：浮在背景图上的界面元素 */
+  --color-glass: rgb(255 255 255 / 0.78);
+  --color-card: rgb(255 255 255 / 0.92);
+  --color-hairline: rgb(16 24 40 / 0.08);
+  --color-sheen: rgb(255 255 255 / 0.55);
+
   --font-sans:
     system-ui, -apple-system, "Segoe UI", "PingFang SC", "Hiragino Sans GB",
     "Microsoft YaHei", "Noto Sans SC", sans-serif;
 
-  --radius-card: 14px;
+  --radius-card: 16px;
 }
 
 .dark {
-  --color-surface: #16181d;
-  --color-canvas: #0f1115;
-  --color-subtle: #1d2027;
-  --color-line: #262a32;
+  --color-surface: #15181f;
+  --color-canvas: #0b0d12;
+  --color-subtle: #1a1e26;
+  --color-line: #272c36;
 
-  --color-ink: #f3f4f6;
-  --color-ink-soft: #d1d5db;
-  --color-muted: #9ca3af;
-  --color-faint: #6b7280;
+  --color-ink: #f2f4f7;
+  --color-ink-soft: #d2d7df;
+  --color-muted: #9aa3b2;
+  --color-faint: #6f7889;
 
-  --color-primary-soft: #17233a;
+  --color-primary-soft: #14243d;
   --color-violet-soft: #241b3a;
-  --color-mint-soft: #12291c;
-  --color-rose-soft: #33161d;
+  --color-mint-soft: #10281b;
+  --color-rose-soft: #32151d;
 
   /* 深色下提亮强调色，保证在深底上的对比度 */
-  --color-primary-strong: #7aa7ff;
+  --color-primary-strong: #7eabff;
   --color-violet: #a78bfa;
   --color-mint: #4ade80;
   --color-amber: #fbbf24;
   --color-rose: #fb7185;
+
+  --color-glass: rgb(17 20 27 / 0.76);
+  --color-card: rgb(20 23 30 / 0.88);
+  --color-hairline: rgb(255 255 255 / 0.08);
+  --color-sheen: rgb(255 255 255 / 0.06);
+}
+
+/* 阴影与背景图的处理强度：跟着主题走，不跟着用户设置走 */
+:root {
+  --shadow-card: 0 1px 2px rgb(16 24 40 / 0.05), 0 18px 38px -26px rgb(16 24 40 / 0.45);
+  --shadow-card-hover: 0 2px 4px rgb(16 24 40 / 0.06), 0 26px 46px -28px rgb(16 24 40 / 0.5);
+  --shadow-panel: 0 28px 60px -38px rgb(16 24 40 / 0.5);
+
+  --art-blur: 8px;
+  --art-saturate: 0.95;
+  --art-brightness: 1;
+
+  /* 用户设置换算出的遮罩强度（layout 会内联覆盖这两个值） */
+  --veil-light: 0.36;
+  --veil-dark: 0.55;
+}
+
+.dark {
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.45), 0 20px 44px -28px rgb(0 0 0 / 0.9);
+  --shadow-card-hover: 0 2px 6px rgb(0 0 0 / 0.5), 0 28px 54px -30px rgb(0 0 0 / 1);
+  --shadow-panel: 0 30px 70px -40px rgb(0 0 0 / 0.95);
+
+  --art-blur: 10px;
+  --art-saturate: 0.82;
+  --art-brightness: 0.88;
 }
 
 html {
   scroll-behavior: smooth;
   color-scheme: light;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.dark html,
 html.dark {
   color-scheme: dark;
 }
@@ -80,23 +123,201 @@ body {
   color: var(--color-ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 /*
- * 背景图不再盖一层厚厚的白雾，正文改为轻微白色描边提升在图片上的可读性。
- * 卡片本身是不透明 bg-surface，所以这条只对页面标题、说明文字起作用。
+ * 背景层：固定铺满视口，分四层叠加 ——
+ * 图 / 品牌微光 / 画布遮罩 / 暗角。
+ * 遮罩不再是一层均匀的白雾，而是「上浓下淡再收边」的渐变：
+ * 顶栏和首屏文字拿到更高的对比度，页面中段还能看见背景图。
  */
-main {
-  text-shadow: 0 1px 2px rgb(255 255 255 / 0.65);
+.site-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background-color: var(--color-canvas);
+  --veil: var(--veil-light);
 }
 
-.dark main {
-  text-shadow: 0 1px 2px rgb(0 0 0 / 0.55);
+.dark .site-backdrop {
+  --veil: var(--veil-dark);
+}
+
+.site-backdrop__image {
+  position: absolute;
+  inset: -4%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  filter: blur(var(--art-blur)) saturate(var(--art-saturate)) brightness(var(--art-brightness));
+}
+
+/* 没有上传背景图时的品牌渐变：玻璃层在任何情况下都有底色可压 */
+.site-backdrop.is-plain .site-backdrop__image {
+  background-image:
+    radial-gradient(55% 45% at 10% -4%, #dbeafe 0%, transparent 68%),
+    radial-gradient(48% 42% at 92% 2%, #ede9fe 0%, transparent 70%),
+    radial-gradient(60% 50% at 70% 104%, #fce7f3 0%, transparent 72%),
+    linear-gradient(180deg, #f7faff 0%, #f5f6fa 100%);
+  filter: none;
+}
+
+.dark .site-backdrop.is-plain .site-backdrop__image {
+  background-image:
+    radial-gradient(55% 45% at 10% -4%, #16233a 0%, transparent 68%),
+    radial-gradient(48% 42% at 92% 2%, #221a35 0%, transparent 70%),
+    radial-gradient(60% 50% at 70% 104%, #2a1822 0%, transparent 72%),
+    linear-gradient(180deg, #0c0f16 0%, #0a0c11 100%);
+}
+
+.site-backdrop__glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(38% 28% at 6% 4%, rgb(191 219 254 / 0.4), transparent 70%),
+    radial-gradient(34% 26% at 96% 8%, rgb(233 213 255 / 0.34), transparent 72%);
+}
+
+.dark .site-backdrop__glow {
+  background:
+    radial-gradient(38% 28% at 6% 4%, rgb(59 130 246 / 0.14), transparent 70%),
+    radial-gradient(34% 26% at 96% 8%, rgb(139 92 246 / 0.12), transparent 72%);
+}
+
+.site-backdrop__veil {
+  position: absolute;
+  inset: 0;
+  /* 先给一层纯色：万一浏览器不支持带 calc() 的 alpha 渐变，遮罩也不会整个失效 */
+  background-color: rgb(250 251 255 / var(--veil));
+  background-image: linear-gradient(
+    180deg,
+    rgb(250 251 255 / calc(var(--veil) * 1.18)) 0%,
+    rgb(250 251 255 / calc(var(--veil) * 1.04)) 18%,
+    rgb(250 251 255 / var(--veil)) 52%,
+    rgb(250 251 255 / calc(var(--veil) * 1.08)) 82%,
+    rgb(250 251 255 / calc(var(--veil) * 1.24)) 100%
+  );
+}
+
+.dark .site-backdrop__veil {
+  background-color: rgb(7 9 14 / var(--veil));
+  background-image: linear-gradient(
+    180deg,
+    rgb(7 9 14 / calc(var(--veil) * 1.18)) 0%,
+    rgb(7 9 14 / calc(var(--veil) * 1.04)) 18%,
+    rgb(7 9 14 / var(--veil)) 52%,
+    rgb(7 9 14 / calc(var(--veil) * 1.08)) 82%,
+    rgb(7 9 14 / calc(var(--veil) * 1.24)) 100%
+  );
+}
+
+.site-backdrop__vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(118% 88% at 50% 34%, transparent 42%, rgb(16 24 40 / 0.16) 100%);
+}
+
+.dark .site-backdrop__vignette {
+  background: radial-gradient(118% 88% at 50% 34%, transparent 38%, rgb(0 0 0 / 0.5) 100%);
+}
+
+/*
+ * 玻璃组件放进 components 层：工具类（border-dashed、bg-* 等）仍然可以覆盖它们，
+ * 否则未分层的自定义类会压过 Tailwind 的 utilities。
+ */
+@layer components {
+  /* 顶栏：磨砂玻璃 + 一道极细的分隔线 */
+  .glass-bar {
+    background-color: var(--color-glass);
+    border-bottom: 1px solid var(--color-hairline);
+    -webkit-backdrop-filter: blur(24px) saturate(1.7);
+    backdrop-filter: blur(24px) saturate(1.7);
+  }
+
+  /* 大块面板：首屏介绍卡、活动卡、设置页外壳 */
+  .glass-panel {
+    background-color: var(--color-glass);
+    border: 1px solid var(--color-hairline);
+    box-shadow: var(--shadow-panel);
+    -webkit-backdrop-filter: blur(22px) saturate(1.45);
+    backdrop-filter: blur(22px) saturate(1.45);
+  }
+
+  /* 内容卡：游戏卡、补丁卡、友情链接卡 */
+  .glass-card {
+    background-color: var(--color-card);
+    border: 1px solid var(--color-hairline);
+    box-shadow: var(--shadow-card);
+  }
+
+  /* 页面标题区：保证大标题永远压在实色上 */
+  .page-head {
+    border-radius: var(--radius-card);
+    background-color: var(--color-card);
+    border: 1px solid var(--color-hairline);
+    box-shadow: var(--shadow-card);
+    padding: 18px 20px;
+  }
+
+  /* 面包屑：小胶囊，避免在背景图上到处补文字描边 */
+  .crumb-pill {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    border-radius: 999px;
+    background-color: var(--color-card);
+    border: 1px solid var(--color-hairline);
+    padding: 5px 12px;
+  }
+
+  /* 分节标题栏：标题与「查看更多」共用一条玻璃条，两端的对比度一起解决 */
+  .section-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border-radius: 14px;
+    background-color: var(--color-card);
+    border: 1px solid var(--color-hairline);
+    box-shadow: var(--shadow-card);
+    padding: 8px 10px 8px 14px;
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
+    backdrop-filter: blur(16px) saturate(1.4);
+  }
+
+  /* 用户关闭了毛玻璃（不支持 backdrop-filter）时退回不透明面板，可读性优先 */
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .glass-bar,
+    .glass-panel,
+    .section-bar {
+      background-color: var(--color-surface);
+    }
+
+    .glass-card {
+      background-color: var(--color-surface);
+    }
+  }
 }
 
 ::selection {
   background: #dbeafe;
   color: #1e3a8a;
+}
+
+.dark ::selection {
+  background: #1e3a8a;
+  color: #eaf2ff;
+}
+
+/* 细滚动条：深色下不至于刺眼 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line) transparent;
 }
 
 /* 隐藏滚动条但保留滚动能力（标签行横向溢出时用） */
@@ -112,20 +333,15 @@ main {
 /* 卡片统一的悬浮反馈 */
 .card-hover {
   transition:
-    box-shadow 0.18s ease,
-    transform 0.18s ease,
-    border-color 0.18s ease;
+    box-shadow 0.2s ease,
+    transform 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .card-hover:hover {
-  border-color: #dfe3e8;
-  box-shadow: 0 6px 20px -8px rgb(17 24 39 / 0.14);
-  transform: translateY(-1px);
-}
-
-.dark .card-hover:hover {
-  border-color: #333944;
-  box-shadow: 0 6px 20px -8px rgb(0 0 0 / 0.5);
+  border-color: rgb(59 130 246 / 0.28);
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-2px);
 }
 
 /* 两行截断（标题） */
@@ -140,7 +356,28 @@ main {
 :focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
-  border-radius: 4px;
+  border-radius: 6px;
+}
+
+/* 尊重系统的「减少动态效果」 */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .card-hover,
+  .card-hover:hover {
+    transition: none;
+    transform: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Markdown 正文（文档页复用） */

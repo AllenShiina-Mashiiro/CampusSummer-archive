@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
+import { Suspense, type CSSProperties } from "react";
 
 import { AgeGate } from "@/components/age-gate";
 import { ProgressBar } from "@/components/progress-bar";
@@ -49,27 +49,38 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   const overlayValue = Number(settings.backgroundOverlay);
   const overlayOpacity = Number.isFinite(overlayValue)
     ? Math.min(90, Math.max(0, overlayValue)) / 100
-    : 0.55;
+    : 0.15;
+  // 站长设置的「遮罩强度」只表示方向，深浅色各走一条更适合自己的曲线：
+  // 浅色用白雾压住插画高光，深色需要更厚的暗纱，否则亮色插画会把文字吃掉。
+  const veilLight = Math.min(0.84, 0.22 + overlayOpacity * 0.9).toFixed(3);
+  const veilDark = Math.min(0.92, 0.42 + overlayOpacity * 0.55).toFixed(3);
+  const backdropStyle = {
+    "--veil-light": veilLight,
+    "--veil-dark": veilDark,
+  } as CSSProperties;
 
   return (
-    <html lang="zh-CN" className="h-full" suppressHydrationWarning>
+    <html lang="zh-CN" className="h-full" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className="min-h-full">
-        {/* 站长在「网站设置」上传的背景图：固定铺满视口，上面盖一层画布色保证正文可读 */}
-        {backgroundImage && (
-          <div aria-hidden className="pointer-events-none fixed inset-0 z-0">
-            <div
-              className="h-full w-full bg-cover bg-center bg-no-repeat"
-              style={{ backgroundImage }}
-            />
-            {/* 遮罩强度由网站设置控制：默认 55%，背景图能看清，正文靠卡片和文字颜色保持可读 */}
-            <div className="absolute inset-0 bg-canvas" style={{ opacity: overlayOpacity }} />
-          </div>
-        )}
+      <body className="min-h-screen min-h-dvh">
+        {/*
+          背景由四层叠加：图 / 品牌微光 / 画布遮罩 / 暗角。
+          没有上传背景图时用品牌渐变兜底，玻璃卡片在浅色和深色下都有底色可压。
+        */}
+        <div
+          aria-hidden
+          className={`site-backdrop ${backgroundImage ? "" : "is-plain"}`}
+          style={backdropStyle}
+        >
+          <div className="site-backdrop__image" style={{ backgroundImage }} />
+          <div className="site-backdrop__glow" />
+          <div className="site-backdrop__veil" />
+          <div className="site-backdrop__vignette" />
+        </div>
 
-        <div className="relative z-10 flex min-h-full flex-col">
+        <div className="relative z-10 flex min-h-screen min-h-dvh flex-col">
           <AgeGate />
           <Suspense fallback={null}>
             <ProgressBar />

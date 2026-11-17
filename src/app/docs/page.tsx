@@ -14,7 +14,7 @@ export const metadata = {
 
 export default function DocsPage() {
   return (
-    <div className="mx-auto w-full max-w-[1240px] px-6 py-6">
+    <div className="mx-auto w-full max-w-[1240px] px-4 py-5 sm:px-6 sm:py-6">
       <Breadcrumb items={[{ label: "帮助文档" }]} />
 
       <div className="mt-4 grid gap-5 lg:grid-cols-[260px_1fr]">
@@ -34,7 +34,7 @@ async function DocSidebar() {
   const tree = await getDocTree();
 
   return (
-    <aside className="h-fit rounded-xl border border-line bg-surface p-3">
+    <aside className="glass-card h-fit rounded-xl p-3">
       <Link
         href="/docs"
         className="flex items-center gap-2 rounded-lg bg-primary-soft px-3 py-2 text-[14.5px] font-medium text-primary-strong"
@@ -53,19 +53,21 @@ async function DocIndex() {
 
   return (
     <section>
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-[25px] font-semibold tracking-tight text-ink">全部文档</h1>
-          <p className="mt-1.5 text-[14px] text-muted">
+      <div className="page-head mb-4 flex items-start justify-between gap-4 sm:mb-5">
+        <div className="min-w-0">
+          <h1 className="text-[24px] font-semibold tracking-tight text-ink sm:text-[25px]">
+            全部文档
+          </h1>
+          <p className="mt-1.5 text-[13.5px] text-muted sm:text-[14px]">
             如果您在网站遇到任何问题，都可以来此处查看帮助文档
           </p>
         </div>
-        <span className="shrink-0 rounded-lg bg-primary-soft px-3 py-1.5 text-[13.5px] font-medium text-primary-strong">
+        <span className="shrink-0 rounded-lg bg-primary-soft px-2.5 py-1.5 text-[12.5px] font-medium text-primary-strong sm:px-3 sm:text-[13.5px]">
           {docs.length} 篇文档
         </span>
       </div>
 
-      <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {docs.map((doc) => (
           <DocCard key={doc.slug} doc={doc} />
         ))}
@@ -93,7 +95,7 @@ function DocCard({ doc }: { doc: DocListItem }) {
   return (
     <Link
       href={`/docs/${doc.slug}`}
-      className="card-hover group flex flex-col overflow-hidden rounded-[14px] border border-line bg-surface"
+      className="glass-card card-hover group flex flex-col overflow-hidden rounded-[14px]"
     >
       <div className={`relative aspect-[16/9] overflow-hidden bg-gradient-to-br ${coverGradient(doc.slug)}`}>
         {doc.coverUrl && (
@@ -130,7 +132,7 @@ function DocsSkeleton() {
       <div className="h-7 w-40 rounded bg-subtle" />
       <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {Array.from({ length: 6 }).map((_, index) => (
-          <div key={index} className="overflow-hidden rounded-[14px] border border-line bg-surface">
+          <div key={index} className="glass-card overflow-hidden rounded-[14px]">
             <div className="aspect-[16/9] bg-subtle" />
             <div className="space-y-2 px-3.5 py-3">
               <div className="h-3.5 w-4/5 rounded bg-subtle" />

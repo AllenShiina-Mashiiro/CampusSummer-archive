@@ -44,7 +44,10 @@ export const SITE_SETTING_DEFAULTS = {
   heroDescription: "非商业的作品与创作脉络整理项目，条目化收录作品、会社、版本与术语。",
   /** 全站固定背景图 */
   backgroundUrl: "",
-  /** 背景遮罩强度：0 = 完全透明，90 = 几乎遮住；默认 15，尽量保留背景原色 */
+  /**
+   * 背景遮罩强度（0-90）：数值越大遮罩越厚，只表示方向。
+   * layout 会按浅色/深色各自换算成实际透明度，并给背景图加一层轻微虚化。
+   */
   backgroundOverlay: "15",
   /** 首页右侧活动卡默认背景图 */
   bannerUrl: "/covers/banner.svg",
