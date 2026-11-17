@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
+import { connection } from "next/server";
 
 import {
   BookIcon,
@@ -193,6 +194,8 @@ function QuickLinks() {
 }
 
 async function LatestGames() {
+  // 屏蔽列表依赖当前登录用户；在读取 Cookie / 验证 JWT 前切换到请求时渲染
+  await connection();
   const blocked = await getBlockedTagSlugs();
   const blockedGames = await getBlockedGameIds();
   const games = await getLatestGames(8, blocked, blockedGames);
