@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import Link from "next/link";
 import { Suspense } from "react";
 
@@ -34,6 +35,7 @@ const SORTS = {
 };
 
 async function PatchList({ searchParams }: { searchParams: PageProps<"/admin/patches">["searchParams"] }) {
+  await connection();
   await requireCapability("resource.manage");
 
   const params = (await searchParams) ?? {};
