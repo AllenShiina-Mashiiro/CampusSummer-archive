@@ -9,8 +9,6 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "db:up": "powershell -ExecutionPolicy Bypass -File scripts/dev-db.ps1 start",
-    "db:down": "powershell -ExecutionPolicy Bypass -File scripts/dev-db.ps1 stop",
     "db:push": "prisma db push",
     "db:seed": "node prisma/seed.mjs",
     "db:seed:reset": "node prisma/seed.mjs --reset",
