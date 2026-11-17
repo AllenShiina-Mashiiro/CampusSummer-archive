@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { Suspense } from "react";
 
 import { sendMailAction } from "@/app/admin/mail-actions";
@@ -30,6 +31,7 @@ export default function AdminMailPage({ searchParams }: PageProps<"/admin/mail">
 }
 
 async function MailForm({ searchParams }: { searchParams: PageProps<"/admin/mail">["searchParams"] }) {
+  await connection();
   await requireCapability("mail.send");
 
   const params = (await searchParams) ?? {};
