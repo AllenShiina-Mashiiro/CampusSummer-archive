@@ -90,7 +90,18 @@ function verifySessionToken(token: string): Record<string, unknown> | null {
 
   try {
     const decoded = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
-    return decoded && typeof decoded === "object" ? (decoded as Record<string, unknown>) : null;
+    if (!decoded || typeof decoded !== "object" || Array.isArray(decoded)) return null;
+
+    const claims = decoded as Record<string, unknown>;
+    // Cookie 的 maxAge 只是浏览器端限制；服务端必须独立验证 JWT 时效，
+    // 否则被复制的旧 Cookie 可在浏览器过期后继续访问 API。
+    const now = Math.floor(Date.now() / 1000);
+    if (typeof claims.exp !== "number" || !Number.isFinite(claims.exp) || now >= claims.exp) {
+      return null;
+    }
+    if (typeof claims.nbf === "number" && now < claims.nbf) return null;
+    if (typeof claims.sub !== "string" || !claims.sub) return null;
+    return claims;
   } catch {
     return null;
   }
