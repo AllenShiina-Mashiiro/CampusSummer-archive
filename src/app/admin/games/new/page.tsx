@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import Link from "next/link";
 import { Suspense } from "react";
 
@@ -17,6 +18,7 @@ export default function NewGamePage({ searchParams }: PageProps<"/admin/games/ne
 }
 
 async function NewGame({ searchParams }: { searchParams: PageProps<"/admin/games/new">["searchParams"] }) {
+  await connection();
   await requireAdmin();
 
   const params = (await searchParams) ?? {};
