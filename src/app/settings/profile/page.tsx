@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
@@ -28,6 +29,7 @@ async function ProfileForm({
 }: {
   searchParams: PageProps<"/settings/profile">["searchParams"];
 }) {
+  await connection();
   const session = await getSession();
   if (!session) redirect("/login?next=/settings/profile");
 
