@@ -34,11 +34,11 @@ export default function TagDetailPage(props: PageProps<"/tags/[slug]">) {
 }
 
 async function TagFeed({
-  await connection();
   params,
   searchParams,
 }: {
   params: PageProps<"/tags/[slug]">["params"];
+  await connection();
   searchParams: PageProps<"/tags/[slug]">["searchParams"];
 }) {
   const [{ slug }, raw] = await Promise.all([params, searchParams]);
