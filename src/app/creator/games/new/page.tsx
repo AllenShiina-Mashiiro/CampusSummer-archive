@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import Link from "next/link";
 import { Suspense } from "react";
 
@@ -25,6 +26,7 @@ async function NewGame({
 }: {
   searchParams: PageProps<"/creator/games/new">["searchParams"];
 }) {
+  await connection();
   await requireCapability("game.publish");
 
   const params = (await searchParams) ?? {};
