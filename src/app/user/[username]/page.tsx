@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -92,6 +93,7 @@ async function Profile({
   const comments = await getUserComments(username);
 
   // 关注状态：仅登录且非本人时需要判断
+  await connection();
   const viewer = await getSession();
   const isFollowing = viewer
     ? Boolean(
