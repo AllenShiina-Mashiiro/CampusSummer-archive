@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
 import { AgeGate } from "@/components/age-gate";
 import { ProgressBar } from "@/components/progress-bar";
@@ -70,7 +71,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
 
         <div className="relative z-10 flex min-h-full flex-col">
           <AgeGate />
-          <ProgressBar />
+          <Suspense fallback={null}>
+            <ProgressBar />
+          </Suspense>
           <SakuraLayer />
           <SiteHeader />
           <main className="flex-1">{children}</main>
