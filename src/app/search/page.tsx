@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { connection } from "next/server";
 import { Suspense } from "react";
 
 import { Breadcrumb } from "@/components/breadcrumb";
@@ -69,7 +70,8 @@ async function SearchBox({ searchParams }: { searchParams: PageProps<"/search">[
   );
 }
 
-async function SearchResults({ searchParams }: { searchParams: PageProps<"/search">["searchParams"] }) {
+async function SearchResults({
+  await connection(); searchParams }: { searchParams: PageProps<"/search">["searchParams"] }) {
   const params = (await searchParams) ?? {};
   const read = (key: string) => {
     const value = params[key];
