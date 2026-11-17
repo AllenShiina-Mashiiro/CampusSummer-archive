@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { Suspense } from "react";
 
 import { banUserAction, setUserRoleAction } from "@/app/admin/game-actions";
@@ -55,6 +56,7 @@ export default function AdminUsersPage({ searchParams }: PageProps<"/admin/users
 }
 
 async function UsersTable({ searchParams }: { searchParams: PageProps<"/admin/users">["searchParams"] }) {
+  await connection();
   const actor = await requireCapability("user.moderate");
 
   const params = (await searchParams) ?? {};
