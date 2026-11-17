@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import Link from "next/link";
 import { Suspense } from "react";
 
@@ -28,6 +29,8 @@ export default function AdminDocsPage({ searchParams }: PageProps<"/admin/docs">
 }
 
 async function DocManager({ searchParams }: { searchParams: PageProps<"/admin/docs">["searchParams"] }) {
+  // cacheComponents 会单独预渲染 Suspense 子树；在该子树读取 Cookie/JWT 前声明动态边界
+  await connection();
   await requireCapability("site.settings");
 
   const params = (await searchParams) ?? {};
