@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { Suspense } from "react";
 
 import { handleAppealAction } from "@/app/admin/report-actions";
@@ -25,6 +26,7 @@ export default function AppealsPage() {
 }
 
 async function AppealList() {
+  await connection();
   await requireCapability("appeal.handle");
 
   const appeals = await db.appeal.findMany({
