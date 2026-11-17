@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -27,6 +28,7 @@ async function EditGame({
   params: PageProps<"/admin/games/[id]">["params"];
   searchParams: PageProps<"/admin/games/[id]">["searchParams"];
 }) {
+  await connection();
   await requireAdmin();
 
   const [{ id }, raw] = await Promise.all([params, searchParams]);
