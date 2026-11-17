@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import Link from "next/link";
 import { Suspense } from "react";
 
@@ -32,6 +33,7 @@ export default function ReportsPage({ searchParams }: PageProps<"/admin/reports"
 }
 
 async function ReportList({ searchParams }: { searchParams: PageProps<"/admin/reports">["searchParams"] }) {
+  await connection();
   await requireCapability("report.handle");
 
   const params = (await searchParams) ?? {};
