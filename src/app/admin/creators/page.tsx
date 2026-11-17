@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { Suspense } from "react";
 
 import { reviewCreatorApplication } from "@/app/admin/creator-actions";
@@ -23,6 +24,7 @@ export default function AdminCreatorsPage() {
 }
 
 async function ApplicationList() {
+  await connection();
   await requireCapability("creator.review");
 
   const applications = await db.creatorApplication.findMany({
