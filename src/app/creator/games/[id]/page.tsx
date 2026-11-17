@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
@@ -30,6 +31,7 @@ async function EditGame({
   params: PageProps<"/creator/games/[id]">["params"];
   searchParams: PageProps<"/creator/games/[id]">["searchParams"];
 }) {
+  await connection();
   const user = await requireCapability("creator.center");
   const [{ id }, raw] = await Promise.all([params, searchParams]);
 
