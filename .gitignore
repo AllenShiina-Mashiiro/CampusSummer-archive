@@ -20,8 +20,7 @@
 .env*
 !.env.example
 
-# local database and uploads
-/.pgdata/
+# local uploads
 /public/uploads/
 
 # IDE / editor
